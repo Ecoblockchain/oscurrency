@@ -37,7 +37,7 @@ class TwilioController < ApplicationController
       end
       memo = memo.join(" ")
 
-      req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => command[1].to_i, :due_date = Time.now, :active = false);
+      req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => command[1].to_i, :due_date => Time.now, :active => false);
       @transact = Exchange.new(:customer => @customer, :worker => @worker, :amount => command[1].to_i, :metadata => req)
 
       if @transact.save
