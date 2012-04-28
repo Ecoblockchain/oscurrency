@@ -5,7 +5,7 @@ class TwilioController < ApplicationController
       exit
     end
 
-    @from_phone = params[:From].gsub(/[^\d]/, '')
+    @from_phone = params[:From].normalize_phone
     @customer = Person.find_by_phone(params[:From])
 
     command = params[:Body].downcase.split
@@ -19,7 +19,7 @@ class TwilioController < ApplicationController
       elsif /(^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$)/ =~ command[0]
         @worker = Person.find_by_email(command[0])
       else
-        @worker = Person.find_by_phone(command[0].gsub(/[^\d]/, ''))
+        @worker = Person.find_by_phone(command[0].normalize_phone)
       end
 
       if nil == @worker
@@ -38,7 +38,7 @@ class TwilioController < ApplicationController
       memo = memo.join(" ")
 
       req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => command[1].to_i, :due_date = Time.now, :active = false);
-      @transact = Exchange.new(:customer => @customer, :worker => @worker, :memo => memo.join(" "), :amount => command[1].to_i, :metadata => req)
+      @transact = Exchange.new(:customer => @customer, :worker => @worker, :amount => command[1].to_i, :metadata => req)
 
       if @transact.save
         ### TODO: what language to do
