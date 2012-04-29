@@ -5,6 +5,19 @@ class TwilioController < ApplicationController
       render :nothing => true and return
     end
 
+    if params[:Body].downcase.trim == 'bored'
+      case rand(4)
+      when 0
+        sms_response "BACE: Bay Area Community Exchange requests 40 hours of web design or development help!" and return
+      when 1
+        sms_response "BACE: Bay Area Community Exchange requests $15k in funding for further accessibility improvements" and return
+      when 2
+        sms_response "BACE: Bay Area Community Exchange requests that you thank yourself for all your hard work this weekend!" and return
+      when 3
+        sms_response "BACE: Bay Area Community Exchange requests jazz fingers in the air" and return
+      end
+    end
+
     @from_phone = params[:From].normalize_phone!
     @customer = Person.find_by_phone(params[:From])
     if nil == @customer
@@ -93,6 +106,9 @@ class TwilioController < ApplicationController
         sms_response "BACE: Something went wrong posting your request. Please try again" and return
       end
       sms_response "BACE: Your request has been posted"
+    when /^s/
+      ## Search offers
+
     else
       sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'"
     end
