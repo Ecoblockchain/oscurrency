@@ -4,19 +4,19 @@
 # Table name: bids
 #
 #  id              :integer(4)      not null, primary key
-#  req_id          :integer(4)      
-#  person_id       :integer(4)      
-#  status_id       :integer(4)      
+#  req_id          :integer(4)
+#  person_id       :integer(4)
+#  status_id       :integer(4)
 #  estimated_hours :decimal(8, 2)   default(0.0)
 #  actual_hours    :decimal(8, 2)   default(0.0)
-#  expiration_date :datetime        
-#  created_at      :datetime        
-#  updated_at      :datetime        
-#  accepted_at     :datetime        
-#  committed_at    :datetime        
-#  completed_at    :datetime        
-#  approved_at     :datetime        
-#  rejected_at     :datetime        
+#  expiration_date :datetime
+#  created_at      :datetime
+#  updated_at      :datetime
+#  accepted_at     :datetime
+#  committed_at    :datetime
+#  completed_at    :datetime
+#  approved_at     :datetime
+#  rejected_at     :datetime
 #
 
 class Bid < ActiveRecord::Base
@@ -101,7 +101,7 @@ class Bid < ActiveRecord::Base
 
   def trigger_offered
     bid_note = Message.new()
-    subject = "BID: " + self.estimated_hours.to_s + " hours - " + self.req.name 
+    subject = "BID: " + self.estimated_hours.to_s + " hours - " + self.req.name
     bid_note.subject = subject.length > 75 ? subject.slice(0,75).concat("...") : subject
     bid_note.content = ""
     bid_note.content << self.private_message_to_requestor + "\n--\n\n" if self.private_message_to_requestor.length > 0
@@ -109,6 +109,11 @@ class Bid < ActiveRecord::Base
     bid_note.sender = self.person
     bid_note.recipient = self.req.person
     bid_note.save!
+
+    if bid_note.recipient.phone
+      Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+    end
   end
 
   def trigger_accepted
@@ -121,6 +126,11 @@ class Bid < ActiveRecord::Base
     bid_note.sender = self.req.person
     bid_note.recipient = self.person
     bid_note.save!
+
+    if bid_note.recipient.phone
+      Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+    end
   end
 
   def trigger_committed
@@ -133,6 +143,11 @@ class Bid < ActiveRecord::Base
     bid_note.sender = self.person
     bid_note.recipient = self.req.person
     bid_note.save!
+
+    if bid_note.recipient.phone
+      Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+    end
   end
 
   def trigger_completed
@@ -145,6 +160,11 @@ class Bid < ActiveRecord::Base
     bid_note.sender = self.person
     bid_note.recipient = self.req.person
     bid_note.save!
+
+    if bid_note.recipient.phone
+      Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+    end
   end
 
   def trigger_approved
