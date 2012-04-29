@@ -14,6 +14,7 @@ class String
 
   def normalize_phone!
     self.gsub!(/\D/, "")
+    self.gsub!(/^[1]/, "")
   end
 
   def remove_html
