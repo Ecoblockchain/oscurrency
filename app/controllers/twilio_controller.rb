@@ -6,6 +6,7 @@ class TwilioController < ApplicationController
     end
 
     @from_phone = params[:From].normalize_phone!
+    logger.debug(@from_phone)
     @customer = Person.find_by_phone(params[:From])
     if nil == @customer
       sms_response "BACE: We don't recognize this phone number, please add it to your profile"
@@ -41,12 +42,15 @@ class TwilioController < ApplicationController
       memo = memo.join(" ")
 
       req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => command[1].to_i, :due_date => Time.now, :active => false);
+      logger.debug(req)
       @transact = Exchange.new(:customer => @customer, :worker => @worker, :amount => command[1].to_i, :metadata => req)
+      logger.debug(@transact)
 
       if @transact.save
         ### TODO: what language to do
         sms_response "BACE: You sent #{command[1]} hours to #{command[0]}"
       else
+        logger.error @transact.errors
         sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again"
       end
     end
