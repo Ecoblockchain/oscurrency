@@ -112,7 +112,7 @@ class Bid < ActiveRecord::Base
 
     if bid_note.recipient.phone
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
-      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject + " from " + bid_note.sender.name + (bid_note.sender.phone ? ". Reach them at " + bid_note.sender.phone : ""))
     end
   end
 
@@ -129,7 +129,7 @@ class Bid < ActiveRecord::Base
 
     if bid_note.recipient.phone
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
-      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject  + " by " + bid_note.sender.name)
     end
   end
 
@@ -146,7 +146,7 @@ class Bid < ActiveRecord::Base
 
     if bid_note.recipient.phone
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
-      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject  + " by " + bid_note.sender.name)
     end
   end
 
@@ -163,7 +163,7 @@ class Bid < ActiveRecord::Base
 
     if bid_note.recipient.phone
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
-      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject)
+      Twilio::Sms.message(ENV["TWILIO_NUMBER"], bid_note.recipient.phone, subject  + " by " + bid_note.sender.name)
     end
   end
 
