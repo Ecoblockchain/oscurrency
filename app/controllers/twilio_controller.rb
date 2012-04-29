@@ -11,29 +11,32 @@ class TwilioController < ApplicationController
       sms_response "BACE: We don't recognize this phone number, please add it to your profile" and return
     end
 
-    command = params[:Body].downcase.split
-    case command.shift
+    text = params[:Body].downcase.split
+    action = text.shift
+    case action
     when /^b/
+      ### Balance
       sms_response "BACE: Your balance is #{@customer.account.balance}" and return
     when /^p/
-      if (command.length < 2)
+      ### Payments
+      if (text.length < 2)
         sms_response "BACE: We didn't get enough information. To pay someone text 'pay 555-555-5555 ##'" and return
-      elsif /(^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$)/ =~ command[0]
-        @worker = Person.find_by_email(command[0])
+      elsif /(^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$)/ =~ text[0]
+        @worker = Person.find_by_email(text[0])
       else
-        @worker = Person.find_by_phone(command[0].normalize_phone!)
+        @worker = Person.find_by_phone(text[0].normalize_phone!)
       end
 
       if nil == @worker
-        sms_response "BACE: Bad email address or phone number when trying to pay. You entered: '" + command[0] + "'" and return
+        sms_response "BACE: Bad or unknown email address or phone number when trying to pay. You entered: '" + text[0] + "'" and return
       end
 
-      if /^\d+$/ !~ command[1]
-        sms_response "BACE: Please enter a valid number of hours to pay. You entered: '" + command[1] + "'" and return
+      if /^\d+$/ !~ text[1]
+        sms_response "BACE: Please enter a valid number of hours to pay. You entered: '" + text[1] + "'" and return
       end
-      amount = command[1].to_i
+      amount = text[1].to_i
 
-      memo = command[2, command.length]
+      memo = text[2, text.length]
       # ignore 'hours', 'hour', 'for' and 'to' at the beginning of a payment memo
       while ['hours', 'hour', 'for', 'to'].include?(memo[0])
         memo.shift
@@ -51,11 +54,29 @@ class TwilioController < ApplicationController
         @transact.save!
       rescue StandardError => msg
         logger.error "Error processing payment: " + msg
-        sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again" and return
+        sms_response "BACE: Something went wrong sending your payment of #{text[1]} hours to #{text[0]}. Please try again" and return
       end
 
       ### TODO: what language to use
-      sms_response "BACE: You paid #{command[1]} hours to #{command[0]}"
+      sms_response "BACE: You paid #{text[1]} hours to #{text[0]}"
+    when /^r/
+      ### Request
+      query = text.join(" ")
+      if /(\d)+\s+hours?/ =~ query
+        hours = $~[1]
+        query = query.gsub(/(\d)+\s+hours?(\s+of)?/, "")
+      end
+
+      req = Req.new(:estimated_hours => hours, :person_id => @customer.id, :name => query, :due_date => 7.days.from_now)
+      begin
+        req.save!
+      rescue StandardError => msg
+        logger.error "Error posting request: " + msg + " \n " + msg.backtrace.join("\n")
+        sms_response "BACE: Something went wrong posting your request. Please try again" and return
+      end
+      sms_response "BACE: Your request has been posted"
+    else
+      sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'"
     end
   end
 
