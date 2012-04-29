@@ -15,7 +15,7 @@ class TwilioController < ApplicationController
     command = params[:Body].downcase.split
     case command.shift
     when /^b/
-      sms_response "BACE: Your balance is " + @customer.account.balance
+      sms_response "BACE: Your balance is #{@customer.account.balance}"
     when /^p/
       if (command.length < 2)
         sms_response "BACE: We didn't get enough information. To pay someone text 'pay 555-555-5555 ##'"
@@ -64,6 +64,6 @@ class TwilioController < ApplicationController
     def sms_response(text)
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
       Twilio::Sms.message(ENV["TWILIO_NUMBER"], @from_phone, text)
-      exit
+      render :nothing => true
     end
 end
