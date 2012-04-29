@@ -14,6 +14,10 @@ class String
 
   def normalize_phone!
     self.gsub!(/\D/, "")
+    if (self.size == 11)
+      self.slice!(0)
+    end
+    self
   end
 
   def remove_html
