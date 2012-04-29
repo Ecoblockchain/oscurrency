@@ -5,8 +5,6 @@ class TwilioController < ApplicationController
       render :nothing => true and return
     end
 
-    logger.error "sms"
-
     @from_phone = params[:From].normalize_phone!
     @customer = Person.find_by_phone(params[:From])
     if nil == @customer
@@ -102,7 +100,6 @@ class TwilioController < ApplicationController
 
   private
     def sms_response(text)
-      logger.error "sms" + text + ENV.inspect
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
       #r = Twilio::Sms.message(ENV["TWILIO_NUMBER"], @from_phone, text)
       render :xml => Twilio::Verb.sms(text)
