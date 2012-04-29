@@ -110,7 +110,11 @@ class TwilioController < ApplicationController
       ## Search offers
       results = Offer.search(text.join(" "))
       offer = results.find(:first, :conditions => ["active AND expiration_date >= ?", DateTime.now], :order => "id desc", :limit => 1)
-      sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours" and return
+      if offer.nil?
+        sms_response "BACE: No offers matched your search" and return
+      else
+        sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours" and return
+      end
     else
       sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'" and return
     end
