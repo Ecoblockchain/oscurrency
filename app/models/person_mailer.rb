@@ -145,7 +145,6 @@ class PersonMailer < ActionMailer::Base
   end
 
   def req_notification(req, recipient)
-    logger.error ("create req")
     from         "#{req.person.name} <#{req.person.email}>"
     reply_to     "#{req.person.name} <#{req.person.email}>"
     recipients   recipient.email
