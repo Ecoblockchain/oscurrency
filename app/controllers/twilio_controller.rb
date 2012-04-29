@@ -2,23 +2,22 @@ class TwilioController < ApplicationController
   def sms
     if params[:AccountSid] != ENV["TWILIO_KEY"]
       logger.error "Invalid Twilio account access: #{$params}"
-      exit
+      render :nothing => true and return
     end
 
     @from_phone = params[:From].normalize_phone!
-    logger.debug(@from_phone)
     @customer = Person.find_by_phone(params[:From])
     if nil == @customer
-      sms_response "BACE: We don't recognize this phone number, please add it to your profile"
+      sms_response "BACE: We don't recognize this phone number, please add it to your profile" and return
     end
 
     command = params[:Body].downcase.split
     case command.shift
     when /^b/
-      sms_response "BACE: Your balance is #{@customer.account.balance}"
+      sms_response "BACE: Your balance is #{@customer.account.balance}" and return
     when /^p/
       if (command.length < 2)
-        sms_response "BACE: We didn't get enough information. To pay someone text 'pay 555-555-5555 ##'"
+        sms_response "BACE: We didn't get enough information. To pay someone text 'pay 555-555-5555 ##'" and return
       elsif /(^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$)/ =~ command[0]
         @worker = Person.find_by_email(command[0])
       else
@@ -26,11 +25,11 @@ class TwilioController < ApplicationController
       end
 
       if nil == @worker
-        sms_response "BACE: Bad email address or phone number when trying to pay. You entered: '" + command[0] + "'"
+        sms_response "BACE: Bad email address or phone number when trying to pay. You entered: '" + command[0] + "'" and return
       end
 
       if /^\d+$/ !~ command[1]
-        sms_response "BACE: Please enter a valid number of hours to pay. You entered: '" + command[1] + "'"
+        sms_response "BACE: Please enter a valid number of hours to pay. You entered: '" + command[1] + "'" and return
       end
       amount = command[1].to_i
 
@@ -52,7 +51,7 @@ class TwilioController < ApplicationController
         @transact.save!
       rescue StandardError => msg
         logger.error "Error processing payment: " + msg
-        sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again"
+        sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again" and return
       end
 
       ### TODO: what language to use
@@ -64,6 +63,6 @@ class TwilioController < ApplicationController
     def sms_response(text)
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
       Twilio::Sms.message(ENV["TWILIO_NUMBER"], @from_phone, text)
-      return render :nothing => true
+      render :nothing => true
     end
 end
