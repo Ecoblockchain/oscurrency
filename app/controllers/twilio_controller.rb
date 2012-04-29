@@ -42,14 +42,17 @@ class TwilioController < ApplicationController
       end
       memo = memo.join(" ")
 
-      req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person_id => @customer.id, :estimated_hours => amount, :due_date => Time.now, :active => false);
-      @transact = Exchange.new(:customer_id => @customer.id, :worker_id => @worker.id, :amount => amount)
-      @transact.metadata = req
-
       begin
+        req = Req.new(:name => memo.blank? ? 'miscellaneous' : memo, :estimated_hours => amount, :due_date => Time.now, :active => false);
+        req.person = @customer
+        req.save!
+        @transact = Exchange.new(:amount => amount)
+        @transact.metadata = req
+        @transact.customer = @customer
+        @transact.worker = @worker
         @transact.save!
 
-        ### TODO: what language to do
+        ### TODO: what language to use
         sms_response "BACE: You paid #{command[1]} hours to #{command[0]}"
       rescue Exception => msg
         logger.error "Error processing payment: " + msg
