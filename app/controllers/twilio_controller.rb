@@ -105,6 +105,6 @@ class TwilioController < ApplicationController
       logger.error "sms" + text + ENV.inspect
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
       #r = Twilio::Sms.message(ENV["TWILIO_NUMBER"], @from_phone, text)
-      Twilio::Verb.sms text
+      render :xml => Twilio::Verb.sms text
     end
 end
