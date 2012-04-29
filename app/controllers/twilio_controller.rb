@@ -102,7 +102,7 @@ class TwilioController < ApplicationController
 
   private
     def sms_response(text)
-      logger.error "sms" + text
+      logger.error "sms" + text + ENV.inspect
       Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
       Twilio::Sms.message(ENV["TWILIO_NUMBER"], @from_phone, text)
       render :nothing => true
