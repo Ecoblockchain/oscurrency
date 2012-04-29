@@ -69,6 +69,19 @@ class TwilioController < ApplicationController
 
       req = Req.new(:estimated_hours => hours, :name => query, :due_date => 7.days.from_now)
       req.person = @customer ## XXX: no idea why i can't just specify person_id above but then it has a nil person object, shouldn't it load that from the db?
+
+      ## See if any part of the text matches any part of a category and if so put it in that category
+      categories = Category.find(:all)
+      categories.each do |c|
+        parts = c.gsub(/[^a-zA-Z\s]/, "").split
+        parts.each do |p|
+          if text.singularize.include? p.singularize
+            req.categories << category
+            break
+          end
+        end
+      end
+
       begin
         req.save!
       rescue StandardError => msg
