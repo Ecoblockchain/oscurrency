@@ -2,7 +2,7 @@
   <ul class="list full">
     <li><%= transacts_link(current_person) %></li>
   <%- unless ENV['QR_CODE_LINK'].nil? -%>
-    <li><%= link_to "Withdraw paper scrip", ENV['QR_CODE_LINK'] %></li>
+    <li><%= image_tag("icons/print.gif") %><%= link_to "Withdraw paper scrip", ENV['QR_CODE_LINK'] %></li>
   <%- end -%>
   </ul>
     <h2>My Active Work</h2>
