@@ -143,7 +143,7 @@ class Req < ActiveRecord::Base
         if worker.active?
           #TempMessage.queue(PersonMailer.create_req_notification(self, worker), nil, worker) if worker.connection_notifications?
           if (worker.phone)
-            text = "BACE: Request created by #{self.person.name}: #{self.name}. Email: #{self.person.email}. Phone: #{self.person.phone}."
+            text = "BACE: Request created by #{self.person.name} for #{pluralize(self.estimated_hours, "hour")} of #{self.name}: Phone: #{self.person.phone}. Email: #{self.person.email}."
             Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
             Twilio::Sms.message(ENV["TWILIO_NUMBER"], worker.phone, text)
           end
