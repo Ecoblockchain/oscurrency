@@ -54,7 +54,7 @@ class TwilioController < ApplicationController
 
         ### TODO: what language to use
         sms_response "BACE: You paid #{command[1]} hours to #{command[0]}"
-      rescue Exception => msg
+      rescue StandardError => msg
         logger.error "Error processing payment: " + msg
         sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again"
       end
