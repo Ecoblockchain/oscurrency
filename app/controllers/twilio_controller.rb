@@ -67,7 +67,8 @@ class TwilioController < ApplicationController
         query = query.gsub(/(\d)+\s+hours?(\s+of)?/, "")
       end
 
-      req = Req.new(:estimated_hours => hours, :person_id => @customer.id, :name => query, :due_date => 7.days.from_now)
+      req = Req.new(:estimated_hours => hours, :name => query, :due_date => 7.days.from_now)
+      req.person = @customer ## XXX: no idea why i can't just specify person_id above but then it has a nil person object, shouldn't it load that from the db?
       begin
         req.save!
       rescue StandardError => msg
