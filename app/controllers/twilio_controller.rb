@@ -15,8 +15,7 @@ class TwilioController < ApplicationController
     command = params[:Body].downcase.split
     case command.shift
     when /^b/
-      puts "Getting balance for currency: #{currency.info.inspect}"
-      sms_response "BACE: Your balance is #{currency.balance}"
+      sms_response "BACE: Your balance is " + @customer.account.balance
     when /^p/
       if (command.length < 2)
         sms_response "BACE: We didn't get enough information. To pay someone text 'pay 555-555-5555 ##'"
@@ -51,13 +50,13 @@ class TwilioController < ApplicationController
         @transact.customer = @customer
         @transact.worker = @worker
         @transact.save!
-
-        ### TODO: what language to use
-        sms_response "BACE: You paid #{command[1]} hours to #{command[0]}"
       rescue StandardError => msg
         logger.error "Error processing payment: " + msg
         sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again"
       end
+
+      ### TODO: what language to use
+      sms_response "BACE: You paid #{command[1]} hours to #{command[0]}"
     end
   end
 
