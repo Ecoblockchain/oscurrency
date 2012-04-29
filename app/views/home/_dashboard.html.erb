@@ -1,6 +1,9 @@
 <h2>My Account</h2>
   <ul class="list full">
     <li><%= transacts_link(current_person) %></li>
+  <%- unless ENV['QR_CODE_LINK'].nil? -%>
+    <li><%= link_to "Withdraw paper scrip", ENV['QR_CODE_LINK'] %></li>
+  <%- end -%>
   </ul>
     <h2>My Active Work</h2>
 <%- if @person.current_and_active_bids.length < 1 -%>
