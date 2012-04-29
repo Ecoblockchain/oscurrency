@@ -153,6 +153,7 @@ class Person < ActiveRecord::Base
   after_create :create_address
   before_save :encrypt_password
   before_save :update_group_letter
+  before_save :normalize_phone_number
   before_validation :prepare_email, :handle_nil_description
   #after_create :connect_to_admin
 
@@ -607,6 +608,10 @@ class Person < ActiveRecord::Base
 
     def update_group_letter
       self.first_letter = name[0,1].capitalize
+    end
+
+    def normalize_phone_number
+      self.phone = phone.to_normalized_phone unless phone.nil?
     end
 
     def check_config_for_deactivation

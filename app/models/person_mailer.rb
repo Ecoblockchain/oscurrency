@@ -172,7 +172,7 @@ class PersonMailer < ActionMailer::Base
   
   # Prepend the application name to subjects if present in preferences.
   def formatted_subject(text)
-    name = PersonMailer.global_prefs.app_name
+    name = ENV['SHORT_APP_NAME'] || PersonMailer.global_prefs.app_name
     label = name.blank? ? "" : "[#{name}] "
     "#{label}#{text}"
   end

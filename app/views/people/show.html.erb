@@ -54,7 +54,7 @@
     <% if @person.phoneprivacy? %>
     <% unless @person.phone.nil? %>
       <div>
-        <%= image_tag "icons/phone.gif", :class => "icon", :alt => "Phone" %> <span class="small">Phone:</span> <span class="added small"><%= h @person.phone %></span>
+        <%= image_tag "icons/phone.gif", :class => "icon", :alt => "Phone" %> <span class="small">Phone:</span> <span class="added small"><%= h format_phone(@person.phone) %></span>
       </div>
       <%- end -%>
     <%- end -%>
