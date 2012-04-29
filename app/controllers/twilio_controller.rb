@@ -5,7 +5,7 @@ class TwilioController < ApplicationController
       render :nothing => true and return
     end
 
-    if params[:Body].downcase.trim == 'bored'
+    if params[:Body].downcase.strip == 'bored'
       case rand(4)
       when 0
         sms_response "BACE: Bay Area Community Exchange requests 40 hours of web design or development help!" and return
