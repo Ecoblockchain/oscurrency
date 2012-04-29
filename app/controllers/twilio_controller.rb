@@ -33,6 +33,7 @@ class TwilioController < ApplicationController
       if /^\d+$/ !~ command[1]
         sms_response "BACE: Please enter a valid number of hours to pay. You entered: '" + command[1] + "'"
       end
+      amount = command[1].to_i
 
       memo = command[2, command.length]
       # ignore 'hours', 'hour', 'for' and 'to' at the beginning of a payment memo
@@ -41,16 +42,16 @@ class TwilioController < ApplicationController
       end
       memo = memo.join(" ")
 
-      req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => command[1].to_i, :due_date => Time.now, :active => false);
-      logger.debug(req)
-      @transact = Exchange.new(:customer => @customer, :worker => @worker, :amount => command[1].to_i, :metadata => req)
-      logger.debug(@transact)
+      req = Req.create(:name => memo.blank? ? 'miscellaneous' : memo, :person => @customer, :estimated_hours => amount, :due_date => Time.now, :active => false);
+      @transact = Exchange.new(:customer => @customer, :worker => @worker, :amount => amount, :metadata => req)
 
-      if @transact.save
+      begin
+        @transact.save!
+
         ### TODO: what language to do
         sms_response "BACE: You sent #{command[1]} hours to #{command[0]}"
-      else
-        logger.error @transact.errors
+      rescue Exception => msg
+        logger.error "Error processing payment: " + msg
         sms_response "BACE: Something went wrong sending your payment of #{command[1]} hours to #{command[0]}. Please try again"
       end
     end
