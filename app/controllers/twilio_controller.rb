@@ -113,7 +113,12 @@ class TwilioController < ApplicationController
       if offer.nil?
         sms_response "BACE: No offers matched your search" and return
       else
-        sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours" and return
+        response = "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours"
+        if offer.person.phone
+          response += ". Phone: #{offer.person.phone}"
+        end
+        response += ". Email: #{offer.person.email}"
+        sms_response response and return
       end
     else
       sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'" and return
