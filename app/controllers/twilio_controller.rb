@@ -7,6 +7,9 @@ class TwilioController < ApplicationController
 
     @from_phone = params[:From].normalize_phone!
     @customer = Person.find_by_phone(params[:From])
+    if nil == @customer
+      sms_response "BACE: We don't recognize this phone number, please add it to your profile"
+    end
 
     command = params[:Body].downcase.split
     case command.shift
