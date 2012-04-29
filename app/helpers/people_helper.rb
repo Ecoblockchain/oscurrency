@@ -4,6 +4,20 @@ module PeopleHelper
     people.map { |p| email_link(p)}
   end
 
+  def format_phone(phone)
+    unless phone.nil?
+      if 7 == phone.length
+        phone[0..2] + "-" + phone[3..6]
+      elsif 10 == phone.length
+        "(" + phone[0..2] + ") " + phone[3..5] + "-" + phone[6..9]
+      else
+        phone
+      end
+    else
+      ""
+    end
+  end
+
   # Return a person's image link.
   # The default is to display the person's icon linked to the profile.
   def image_link(person, options = {})
