@@ -105,15 +105,15 @@ class TwilioController < ApplicationController
         logger.error "Error posting request: " + msg + " \n " + msg.backtrace.join("\n")
         sms_response "BACE: Something went wrong posting your request. Please try again" and return
       end
-      sms_response "BACE: Your request has been posted"
+      sms_response "BACE: Your request has been posted" and return
     when /^s/
       ## Search offers
       results = Offer.search(text.join(" "))
       logger.error results
       offer = results[0]
-      sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours"
+      sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours" and return
     else
-      sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'"
+      sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'" and return
     end
   end
 
