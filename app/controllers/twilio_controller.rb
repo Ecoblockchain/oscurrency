@@ -108,7 +108,10 @@ class TwilioController < ApplicationController
       sms_response "BACE: Your request has been posted"
     when /^s/
       ## Search offers
-
+      results = Offer.search(text.join(" "))
+      logger.error results
+      offer = results[0]
+      sms_response "BACE: We found the following offer by #{offer.person.name}: #{offer.name} for #{offer.price} hours"
     else
       sms_response "BACE: We didn't understand #{action}. Available options are 'pay', 'balance', 'search', 'request'"
     end
