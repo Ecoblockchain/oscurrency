@@ -17,6 +17,10 @@ class String
     self.gsub!(/^[1]/, "")
   end
 
+  def to_normalized_phone
+    self.gsub(/\D/, "").gsub(/^[1]/, "")
+  end
+
   def remove_html
     tokenizer = HTML::Tokenizer.new(self)
     result = ""
