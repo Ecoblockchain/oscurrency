@@ -1,14 +1,14 @@
 class PersonMailer < ActionMailer::Base
   extend PreferencesHelper
-  
+
   def domain
     @domain ||= PersonMailer.global_prefs.domain
   end
-  
+
   def server
     @server ||= PersonMailer.global_prefs.server_name
   end
-  
+
   def password_reset(person)
     from         "Password reset <password-reset@#{domain}>"
     recipients   person.email
@@ -16,7 +16,7 @@ class PersonMailer < ActionMailer::Base
     body         "server" => server, "person" => person
     content_type "text/html"
   end
-  
+
   def message_notification(message)
     # +++ these probably want to be parameters
     sender_name = message.sender ? message.sender.name : "Time Exchange Notes"
@@ -29,11 +29,11 @@ class PersonMailer < ActionMailer::Base
     body         "server" => server, "message" => message,
     "preferences_note" => preferences_note(message.recipient)
   end
-  
+
   def temp_message_notification(message)
     message_notification(message)
   end
-  
+
   def connection_request(connection)
     from         "#{connection.contact.name} <connection@#{domain}>"
     recipients   connection.person.email
@@ -43,7 +43,7 @@ class PersonMailer < ActionMailer::Base
     "url" => edit_connection_path(connection),
     "preferences_note" => preferences_note(connection.person)
   end
-  
+
   def membership_public_group(membership)
     from         "#{membership.group.name} <membership@#{domain}>"
     recipients   membership.group.owner.email
@@ -53,7 +53,7 @@ class PersonMailer < ActionMailer::Base
     "url" => members_group_path(membership.group),
     "preferences_note" => preferences_note(membership.group.owner)
   end
-  
+
   def membership_request(membership)
     from         "#{membership.group.name} <membership@#{domain}>"
     recipients   membership.group.owner.email
@@ -63,7 +63,7 @@ class PersonMailer < ActionMailer::Base
     "url" => members_group_path(membership.group),
     "preferences_note" => preferences_note(membership.group.owner)
   end
-  
+
   def membership_accepted(membership)
     from         "#{membership.group.name} <membership@#{domain}>"
     recipients   membership.person.email
@@ -73,7 +73,7 @@ class PersonMailer < ActionMailer::Base
     "url" => group_path(membership.group),
     "preferences_note" => preferences_note(membership.person)
   end
-  
+
   def invitation_notification(membership, custom_message)
     from         "#{membership.group.name} <invitation#{domain}>"
     recipients   membership.person.email
@@ -84,7 +84,7 @@ class PersonMailer < ActionMailer::Base
     "url" => edit_membership_path(membership),
     "preferences_note" => preferences_note(membership.person)
   end
-  
+
   def invitation_accepted(membership)
     from         "#{membership.group.name} <invitation@#{domain}>"
     recipients   membership.group.owner.email
@@ -94,35 +94,35 @@ class PersonMailer < ActionMailer::Base
     "url" => members_group_path(membership.group),
     "preferences_note" => preferences_note(membership.group.owner)
   end
-  
+
   def blog_comment_notification(comment)
     from         "Blog <comment@#{domain}>"
     recipients   comment.commented_person.email
     subject      formatted_subject("New blog comment")
     body         "server" => server, "comment" => comment,
-    "url" => 
+    "url" =>
       blog_post_path(comment.commentable.blog, comment.commentable),
-    "preferences_note" => 
+    "preferences_note" =>
       preferences_note(comment.commented_person)
   end
-  
+
   def wall_comment_notification(comment)
     from         "Wall <comment@#{domain}>"
     recipients   comment.commented_person.email
     subject      formatted_subject("New wall comment")
     body         "server" => server, "comment" => comment,
     "url" => person_path(comment.commentable, :anchor => "wall"),
-    "preferences_note" => 
+    "preferences_note" =>
       preferences_note(comment.commented_person)
   end
-  
+
   def forum_post_notification(subscriber, forum_post)
     from         "#{forum_post.person.name} <forum@#{domain}>"
     recipients   subscriber.email
     subject      formatted_group_subject(forum_post.topic.forum.group, forum_post.topic.name)
     content_type "text/html"
     body         "server" => server, "forum_post" => forum_post,
-    "preferences_note" => 
+    "preferences_note" =>
       preferences_note(subscriber)
   end
 
@@ -145,6 +145,7 @@ class PersonMailer < ActionMailer::Base
   end
 
   def req_notification(req, recipient)
+    logger.error ("create req")
     from         "#{req.person.name} <#{req.person.email}>"
     reply_to     "#{req.person.name} <#{req.person.email}>"
     recipients   recipient.email
@@ -167,9 +168,9 @@ class PersonMailer < ActionMailer::Base
                  "offerer" => offer.person.name,
                  "url" => offer_path(offer)
   end
-  
+
   private
-  
+
   # Prepend the application name to subjects if present in preferences.
   def formatted_subject(text)
     name = ENV['SHORT_APP_NAME'] || PersonMailer.global_prefs.app_name
@@ -184,10 +185,10 @@ class PersonMailer < ActionMailer::Base
       "[#{group.name}] #{text}"
     end
   end
-  
+
   def preferences_note(person)
     %(To change your email notification preferences, visit
-      
+
 http://#{server}/people/#{person.to_param}/edit)
   end
 

@@ -4,27 +4,27 @@
 # Table name: reqs
 #
 #  id              :integer(4)      not null, primary key
-#  name            :string(255)     
-#  description     :text            
+#  name            :string(255)
+#  description     :text
 #  estimated_hours :decimal(8, 2)   default(0.0)
-#  due_date        :datetime        
-#  person_id       :integer(4)      
-#  created_at      :datetime        
-#  updated_at      :datetime        
+#  due_date        :datetime
+#  person_id       :integer(4)
+#  created_at      :datetime
+#  updated_at      :datetime
 #  active          :boolean(1)      default(TRUE)
-#  twitter         :boolean(1)      
+#  twitter         :boolean(1)
 #
 
 class Req < ActiveRecord::Base
   include ActivityLogger
-  extend PreferencesHelper 
+  extend PreferencesHelper
 
   index do
     name
     description
   end
-  
-  
+
+
   has_and_belongs_to_many :categories
   belongs_to :person
   belongs_to :group
@@ -141,7 +141,13 @@ class Req < ActiveRecord::Base
       workers.uniq!
       workers.each do |worker|
         if worker.active?
-          TempMessage.queue(PersonMailer.create_req_notification(self, worker), nil, worker) if worker.connection_notifications?
+          PersonMailer.create_req_notification(self, worker)
+          #TempMessage.queue(PersonMailer.create_req_notification(self, worker), nil, worker) if worker.connection_notifications?
+          if (worker.phone)
+            text = "BACE: Request created by #{self.person.name}: #{req.name}. Phone: #{self.person.worker}."
+            Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
+            Twilio::Sms.message(ENV["TWILIO_NUMBER"], worker.phone, text)
+          end
         end
       end
     end
