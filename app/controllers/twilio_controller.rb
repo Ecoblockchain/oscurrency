@@ -5,7 +5,7 @@ class TwilioController < ApplicationController
       exit
     end
 
-    @from_phone = params[:From].normalize_phone
+    @from_phone = params[:From].normalize_phone!
     @customer = Person.find_by_phone(params[:From])
 
     command = params[:Body].downcase.split
@@ -19,7 +19,7 @@ class TwilioController < ApplicationController
       elsif /(^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$)/ =~ command[0]
         @worker = Person.find_by_email(command[0])
       else
-        @worker = Person.find_by_phone(command[0].normalize_phone)
+        @worker = Person.find_by_phone(command[0].normalize_phone!)
       end
 
       if nil == @worker
