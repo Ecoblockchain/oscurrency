@@ -86,7 +86,6 @@ class TwilioController < ApplicationController
       # Look for neighborhoods and categories
       categories = Category.find(:all)
       text.each do |word|
-
         ## See if any part of the text matches any part of a category and if so put it in that category
         categories.each do |c|
           parts = c.name.gsub(/[^a-zA-Z\s]/, "").split
@@ -97,6 +96,9 @@ class TwilioController < ApplicationController
             end
           end
         end
+      end
+      if req.categories.empty?
+        req.categories << Category.find_by_name("Miscellaneous")
       end
 
       begin
