@@ -145,7 +145,7 @@ class Req < ActiveRecord::Base
           if (worker.phone)
             text = "BACE: Request created by #{self.person.name} for "
             if self.estimated_hours
-              text += self.estimated_hours + " hours of "
+              text += "#{self.estimated_hours} hours of "
             end
             text += "#{self.name}: Phone: #{self.person.phone}. Email: #{self.person.email}."
             Twilio.connect(ENV['TWILIO_KEY'], ENV["TWILIO_SECRET"])
