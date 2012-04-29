@@ -75,9 +75,9 @@ class TwilioController < ApplicationController
     when /^r/
       ### Request
       query = text.join(" ")
-      if /(\d)+\s+hours?/ =~ query
+      if /(\d+)\s+hours?/ =~ query
         hours = $~[1]
-        query = query.gsub(/(\d)+\s+hours?(\s+of)?/, "")
+        query = query.gsub(/(for\s+)?(\d)+\s+hours?(\s+of)?/, "").strip
       end
 
       req = Req.new(:estimated_hours => hours, :name => query, :due_date => 7.days.from_now, :notifications => true)
